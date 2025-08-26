@@ -21,7 +21,10 @@ This implementation plan provides a step-by-step, sprint-based roadmap for build
 - **CON-002**: All tasks must be executable and independently verifiable
 - **PAT-001**: Use wizard-style workflow for user guidance
 
-## 2. Implementation Steps
+
+## 2. Implementation Steps (Expanded)
+
+### 1. MVP and Core Features
 
 | Sprint | Phase/Task ID | Description | File(s) | Validation Criteria |
 |-------|--------------|-------------|---------|--------------------|
@@ -40,26 +43,129 @@ This implementation plan provides a step-by-step, sprint-based roadmap for build
 | 1 | TASK-1.13 | Ensure accessibility (semantic HTML, keyboard navigation, ARIA roles) | `/src/components/` | Screen reader/keyboard tested |
 | 1 | TASK-1.14 | Write unit/integration tests | `/src/tests/` | Tests pass, coverage >80% |
 | 1 | TASK-1.15 | Document MVP setup and usage | `/README.md`, `/docs/` | Docs reviewed, setup reproducible |
-| 2 | TASK-2.1 | Implement Excel/CSV import for recipients | `/src/components/ImportRecipients/` | Import works, errors handled |
-| 2 | TASK-2.2 | Build asset library for backgrounds/logos/signatures | `/src/components/AssetLibrary/` | Assets reusable, UI tested |
-| 2 | TASK-2.3 | Enhance error handling for import/asset management | `/src/components/`, `/src/api/` | Errors shown, correction possible |
-| 2 | TASK-2.4 | Test accessibility for new features | `/src/components/` | Screen reader/keyboard tested |
-| 3 | TASK-3.1 | Add signature upload and placement | `/src/components/Designer/` | Signature upload/placement works |
-| 3 | TASK-3.2 | Update designer for image fields | `/src/components/Designer/` | Image fields supported |
-| 3 | TASK-3.3 | Implement instant preview | `/src/components/Preview/` | Preview updates instantly |
-| 3 | TASK-3.4 | Add progress bar for batch operations | `/src/components/Progress/` | Progress shown, batch tested |
-| 4 | TASK-4.1 | Implement template save/load | `/src/components/TemplateManager/` | Templates saved/loaded |
-| 4 | TASK-4.2 | Build gallery of built-in designs | `/src/components/DesignGallery/` | Gallery visible, selection works |
-| 4 | TASK-4.3 | Develop dashboard for events/templates | `/src/components/Dashboard/` | Dashboard lists events/templates |
-| 5 | TASK-5.1 | Integrate email service (SendGrid/Mailgun) | `/src/api/email/` | Emails sent, status tracked |
-| 5 | TASK-5.2 | Build email sending workflow | `/src/components/Email/` | Single/batch email works |
-| 5 | TASK-5.3 | Add accessibility for distribution | `/src/components/Email/` | Screen reader/keyboard tested |
-| 6 | TASK-6.1 | Implement analytics dashboard | `/src/components/Analytics/` | Delivery/usage stats shown |
-| 6 | TASK-6.2 | Optimize performance for large events | `/src/`, `/infra/` | Large imports/generation tested |
-| 6 | TASK-6.3 | Add support for more export formats | `/src/api/`, `/src/utils/` | SVG/DOCX export works |
-| 6 | TASK-6.4 | Enable custom fields in designer/templates | `/src/components/Designer/` | Custom fields supported |
-| 6 | TASK-6.5 | Conduct load/performance testing | `/src/tests/` | Tests pass, performance meets targets |
-| 6 | TASK-6.6 | Gather user feedback, iterate | `/src/`, `/docs/` | Feedback reviewed, changes tracked |
+
+### 2. Advanced Features and Frontend Refinement (Tasks 2.1–6.6)
+
+#### 2.1 ImportRecipients (CSV/Excel Import)
+- Design UI with clear instructions and drag-and-drop/file picker.
+- Implement file type/size validation before parsing.
+- Use a parsing library (e.g., `papaparse` for CSV, `xlsx` for Excel).
+- Show a preview of parsed data before confirming import.
+- Allow user to edit/remove imported entries before saving.
+- Integrate with global state/context for downstream use.
+- Add ARIA labels and keyboard navigation for all controls.
+- Write unit tests for parsing, error handling, and UI states.
+
+#### 2.2 AssetLibrary (Backgrounds/Logos/Signatures)
+- UI for asset upload, preview, and management (delete, rename).
+- Validate file type/size and sanitize filenames.
+- Store assets in local state or backend (with API integration).
+- Enable selection of assets for use in Designer.
+- Add accessibility: alt text for images, keyboard navigation, ARIA roles.
+- Write tests for upload, preview, error handling, and asset selection.
+
+#### 2.3 Error Handling & Correction
+- Use ErrorFeedback for all user-facing errors.
+- Implement a global ErrorBoundary to catch uncaught exceptions.
+- Provide actionable error messages and retry options.
+- Log errors for monitoring (frontend and backend).
+- Test error scenarios (invalid file, network failure, etc.).
+
+#### 2.4 Accessibility Audit
+- Use tools like axe-core, Lighthouse, or manual keyboard/screen reader testing.
+- Document all accessibility issues and remediation steps.
+- Ensure all interactive elements are reachable and usable via keyboard.
+- Add ARIA attributes and roles where needed.
+- Test with screen readers (NVDA, VoiceOver).
+
+#### 3.1 SignatureUpload & Placement
+- UI for uploading signature image, with preview and error handling.
+- Allow drag-and-drop placement and resizing in Designer.
+- Store signature position and size in template data.
+- Add keyboard controls for moving/resizing signature.
+- Test upload, placement, and accessibility.
+
+#### 3.2 Designer Image Fields
+- Support multiple image fields (background, logo, signature).
+- Implement drag, resize, and delete for images.
+- Show bounding boxes and handles for resizing.
+- Persist image field data in template.
+- Write tests for all image field operations.
+
+#### 3.3 Instant Preview
+- Render a live preview of the certificate as user edits designer.
+- Sync designer state with preview component.
+- Use canvas or SVG for rendering preview.
+- Ensure preview matches final generated certificate.
+- Test for performance and accuracy.
+
+#### 3.4 ProgressBar for Batch Operations
+- Show progress during batch certificate generation/download.
+- Update progress in real-time via API or frontend state.
+- Add accessible markup (role="progressbar", ARIA attributes).
+- Test with large batches for performance and usability.
+
+#### 4.1 TemplateManager (Save/Load)
+- UI for naming, saving, and loading templates.
+- Store templates in local storage or backend.
+- Allow user to preview and select templates.
+- Validate template data before saving/loading.
+- Write tests for template CRUD operations.
+
+#### 4.2 DesignGallery (Built-in Designs)
+- Display gallery of built-in designs with previews.
+- Allow user to select and apply a design to current template.
+- Add accessibility: alt text, keyboard navigation, ARIA roles.
+- Test gallery display and selection.
+
+#### 4.3 Dashboard (Events/Templates)
+- List all events and associated templates.
+- Allow filtering, searching, and sorting.
+- Provide links to edit/view event details and templates.
+- Add accessibility for table/grid navigation.
+- Write tests for dashboard features.
+
+#### 5.1–5.3 Email Integration & Accessibility
+- Integrate SendGrid/Mailgun API for sending emails.
+- UI for composing, previewing, and sending single/batch emails.
+- Show email status (sent, failed, queued).
+- Add accessibility for all email workflow steps.
+- Test email sending, error handling, and accessibility.
+
+#### 6.1 Analytics Dashboard
+- UI for viewing delivery/usage stats (charts, tables).
+- Fetch analytics data from backend.
+- Allow filtering by event, date, template.
+- Add accessibility for charts/tables.
+- Write tests for analytics features.
+
+#### 6.2 Performance Optimization
+- Profile frontend for slow operations (large imports, batch generation).
+- Use virtualization for large lists/grids.
+- Optimize API calls and state updates.
+- Test with large datasets.
+
+#### 6.3 Export Formats
+- Add options for exporting certificates as SVG/DOCX.
+- Integrate export logic in backend and frontend.
+- UI for selecting export format.
+- Test export for correctness and compatibility.
+
+#### 6.4 Custom Fields in Designer/Templates
+- UI for adding/removing custom fields (text, date, etc.).
+- Persist custom field data in template.
+- Render custom fields in preview and final certificate.
+- Test custom field operations.
+
+#### 6.5 Load/Performance Testing
+- Use automated tools (Jest, Cypress, Lighthouse) for load testing.
+- Simulate large events and batch operations.
+- Document and address performance bottlenecks.
+
+#### 6.6 User Feedback & Iteration
+- Collect feedback via surveys, in-app forms, or analytics.
+- Prioritize and implement UI/UX improvements.
+- Track changes and validate with follow-up testing.
 
 ## 3. Alternatives
 
@@ -109,7 +215,133 @@ This implementation plan provides a step-by-step, sprint-based roadmap for build
 - Add security tests for authentication, input validation, secrets management (Sprint 1+)
 - Add monitoring/logging tests (error tracking, alerting) (Sprint 1+)
 
-## 8. Related Specifications / Further Reading
+
+## 8. Frontend Refinement: Expanded Implementation Steps (Tasks 2.1–6.6)
+
+This section provides detailed, actionable steps for frontend refinement, usability, accessibility, and maintainability, expanding on tasks 2.1–6.6.
+
+### 2.1 ImportRecipients (CSV/Excel Import)
+- Design UI with clear instructions and drag-and-drop/file picker.
+- Implement file type/size validation before parsing.
+- Use a parsing library (e.g., `papaparse` for CSV, `xlsx` for Excel).
+- Show a preview of parsed data before confirming import.
+- Allow user to edit/remove imported entries before saving.
+- Integrate with global state/context for downstream use.
+- Add ARIA labels and keyboard navigation for all controls.
+- Write unit tests for parsing, error handling, and UI states.
+
+### 2.2 AssetLibrary (Backgrounds/Logos/Signatures)
+- UI for asset upload, preview, and management (delete, rename).
+- Validate file type/size and sanitize filenames.
+- Store assets in local state or backend (with API integration).
+- Enable selection of assets for use in Designer.
+- Add accessibility: alt text for images, keyboard navigation, ARIA roles.
+- Write tests for upload, preview, error handling, and asset selection.
+
+### 2.3 Error Handling & Correction
+- Use ErrorFeedback for all user-facing errors.
+- Implement a global ErrorBoundary to catch uncaught exceptions.
+- Provide actionable error messages and retry options.
+- Log errors for monitoring (frontend and backend).
+- Test error scenarios (invalid file, network failure, etc.).
+
+### 2.4 Accessibility Audit
+- Use tools like axe-core, Lighthouse, or manual keyboard/screen reader testing.
+- Document all accessibility issues and remediation steps.
+- Ensure all interactive elements are reachable and usable via keyboard.
+- Add ARIA attributes and roles where needed.
+- Test with screen readers (NVDA, VoiceOver).
+
+### 3.1 SignatureUpload & Placement
+- UI for uploading signature image, with preview and error handling.
+- Allow drag-and-drop placement and resizing in Designer.
+- Store signature position and size in template data.
+- Add keyboard controls for moving/resizing signature.
+- Test upload, placement, and accessibility.
+
+### 3.2 Designer Image Fields
+- Support multiple image fields (background, logo, signature).
+- Implement drag, resize, and delete for images.
+- Show bounding boxes and handles for resizing.
+- Persist image field data in template.
+- Write tests for all image field operations.
+
+### 3.3 Instant Preview
+- Render a live preview of the certificate as user edits designer.
+- Sync designer state with preview component.
+- Use canvas or SVG for rendering preview.
+- Ensure preview matches final generated certificate.
+- Test for performance and accuracy.
+
+### 3.4 ProgressBar for Batch Operations
+- Show progress during batch certificate generation/download.
+- Update progress in real-time via API or frontend state.
+- Add accessible markup (role="progressbar", ARIA attributes).
+- Test with large batches for performance and usability.
+
+### 4.1 TemplateManager (Save/Load)
+- UI for naming, saving, and loading templates.
+- Store templates in local storage or backend.
+- Allow user to preview and select templates.
+- Validate template data before saving/loading.
+- Write tests for template CRUD operations.
+
+### 4.2 DesignGallery (Built-in Designs)
+- Display gallery of built-in designs with previews.
+- Allow user to select and apply a design to current template.
+- Add accessibility: alt text, keyboard navigation, ARIA roles.
+- Test gallery display and selection.
+
+### 4.3 Dashboard (Events/Templates)
+- List all events and associated templates.
+- Allow filtering, searching, and sorting.
+- Provide links to edit/view event details and templates.
+- Add accessibility for table/grid navigation.
+- Write tests for dashboard features.
+
+### 5.1–5.3 Email Integration & Accessibility
+- Integrate SendGrid/Mailgun API for sending emails.
+- UI for composing, previewing, and sending single/batch emails.
+- Show email status (sent, failed, queued).
+- Add accessibility for all email workflow steps.
+- Test email sending, error handling, and accessibility.
+
+### 6.1 Analytics Dashboard
+- UI for viewing delivery/usage stats (charts, tables).
+- Fetch analytics data from backend.
+- Allow filtering by event, date, template.
+- Add accessibility for charts/tables.
+- Write tests for analytics features.
+
+### 6.2 Performance Optimization
+- Profile frontend for slow operations (large imports, batch generation).
+- Use virtualization for large lists/grids.
+- Optimize API calls and state updates.
+- Test with large datasets.
+
+### 6.3 Export Formats
+- Add options for exporting certificates as SVG/DOCX.
+- Integrate export logic in backend and frontend.
+- UI for selecting export format.
+- Test export for correctness and compatibility.
+
+### 6.4 Custom Fields in Designer/Templates
+- UI for adding/removing custom fields (text, date, etc.).
+- Persist custom field data in template.
+- Render custom fields in preview and final certificate.
+- Test custom field operations.
+
+### 6.5 Load/Performance Testing
+- Use automated tools (Jest, Cypress, Lighthouse) for load testing.
+- Simulate large events and batch operations.
+- Document and address performance bottlenecks.
+
+### 6.6 User Feedback & Iteration
+- Collect feedback via surveys, in-app forms, or analytics.
+- Prioritize and implement UI/UX improvements.
+- Track changes and validate with follow-up testing.
+
+## 9. Related Specifications / Further Reading
 
 - [spec/spec-design-certificate-generator-web-app.md]
 - [Azure Well-Architected Framework]
