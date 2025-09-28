@@ -29,8 +29,15 @@ export async function generateZipWithCertificates(data: {
   });
   
   if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.error || 'Failed to generate certificates');
+    let errorMessage = 'Failed to generate certificates';
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.error || errorMessage;
+    } catch {
+      // If response is not JSON, use status text
+      errorMessage = `Server error: ${res.status} ${res.statusText}`;
+    }
+    throw new Error(errorMessage);
   }
   
   // Return the blob for download

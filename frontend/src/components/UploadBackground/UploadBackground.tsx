@@ -2,12 +2,21 @@ import React, { useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { Upload, Image, AlertCircle, CheckCircle } from 'lucide-react';
+import { useDesign } from '../../context/DesignContext';
 
 export default function UploadBackground() {
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const { designSettings, setBackgroundImage } = useDesign();
+
+  // Initialize preview with existing background image
+  React.useEffect(() => {
+    if (designSettings.backgroundImage && !preview) {
+      setPreview(designSettings.backgroundImage);
+    }
+  }, [designSettings.backgroundImage, preview]);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setError(null);
@@ -33,7 +42,9 @@ export default function UploadBackground() {
 
     const reader = new FileReader();
     reader.onload = () => {
-      setPreview(reader.result as string);
+      const result = reader.result as string;
+      setPreview(result);
+      setBackgroundImage(result); // Store in DesignContext
       setIsUploading(false);
     };
     reader.onerror = () => {
@@ -45,6 +56,11 @@ export default function UploadBackground() {
 
   function handleUploadClick() {
     fileInput.current?.click();
+  }
+
+  function handleRemoveBackground() {
+    setPreview(null);
+    setBackgroundImage('');
   }
 
   return (
@@ -93,14 +109,23 @@ export default function UploadBackground() {
                     className="max-w-full max-h-64 rounded-lg shadow-lg border"
                   />
                 </div>
-                <Button 
-                  variant="outline"
-                  onClick={handleUploadClick}
-                  className="px-6"
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Change Background
-                </Button>
+                <div className="flex gap-2 justify-center">
+                  <Button 
+                    variant="outline"
+                    onClick={handleUploadClick}
+                    className="px-6"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Change Background
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={handleRemoveBackground}
+                    className="px-6 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    Remove Background
+                  </Button>
+                </div>
                 <input
                   type="file"
                   accept="image/*"

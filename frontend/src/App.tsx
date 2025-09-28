@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { Progress } from './components/ui/progress';
-import { Award, Upload, Palette, Users, Download, CheckCircle, FileText } from 'lucide-react';
+import { Award, Upload, Palette, Users, Download, CheckCircle, FileText, Settings } from 'lucide-react';
 import UploadBackground from './components/UploadBackground/UploadBackground';
 import Designer from './components/Designer/Designer';
-import RecipientEntry from './components/RecipientEntry/RecipientEntry';
-import ImportRecipients from './components/ImportRecipients/ImportRecipients';
+import Recipients from './components/Recipients/Recipients';
+import CustomizeLayout from './components/CustomizeLayout/CustomizeLayout';
 import DownloadLink from './components/Download/DownloadLink';
 import AccessibilityHelper from './components/AccessibilityHelper';
+import { DesignProvider } from './context/DesignContext';
+import { RecipientsProvider } from './context/RecipientsContext';
 
 function App() {
   const steps = [
@@ -25,16 +27,16 @@ function App() {
       description: 'Customize text and add signatures'
     },
     { 
-      label: 'Import Recipients', 
-      icon: FileText,
-      component: <ImportRecipients />,
-      description: 'Import recipients from CSV file'
+      label: 'Add Recipients', 
+      icon: Users,
+      component: <Recipients />,
+      description: 'Add recipients manually or import from CSV'
     },
     { 
-      label: 'Enter Recipients', 
-      icon: Users,
-      component: <RecipientEntry />,
-      description: 'Add recipient information manually'
+      label: 'Customize Layout', 
+      icon: Settings,
+      component: <CustomizeLayout />,
+      description: 'Adjust text positions for each recipient'
     },
     { 
       label: 'Preview & Download', 
@@ -48,7 +50,9 @@ function App() {
   const progressPercentage = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50" role="main">
+    <RecipientsProvider>
+      <DesignProvider>
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50" role="main">
       <AccessibilityHelper />
       
       {/* Header */}
@@ -168,6 +172,8 @@ function App() {
         </div>
       </div>
     </main>
+      </DesignProvider>
+    </RecipientsProvider>
   );
 }
 
