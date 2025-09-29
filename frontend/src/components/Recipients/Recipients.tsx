@@ -16,22 +16,52 @@ import {
   FileUp
 } from 'lucide-react';
 import ErrorFeedback from '../ErrorFeedback';
-import { useRecipients } from '../../context/RecipientsContext';
+import { useRecipients, Recipient } from '../../context/RecipientsContext';
 import { useDesign } from '../../context/DesignContext';
 
-interface Recipient {
-  id: number;
+interface ParsedRecipient {
   name: string;
   email?: string;
 }
 
-// Simple CSV parser (replace with papaparse/xlsx for production)
-function parseCSV(text: string): { name: string }[] {
+// CSV parser that handles different formats
+function parseCSV(text: string): ParsedRecipient[] {
   return text
     .split(/\r?\n/)
     .map(line => line.trim())
     .filter(Boolean)
-    .map(name => ({ name }));
+    .map(line => {
+      // Split by comma and clean up each part
+      const parts = line.split(',').map(part => part.trim().replace(/^["']|["']$/g, ''));
+      
+      if (parts.length === 1) {
+        // Just a name: "Jim Green"
+        return { name: parts[0] };
+      } else if (parts.length === 2) {
+        // Could be: "Jim Green,jim@example.com" or "Jim,Green"
+        if (parts[1].includes('@')) {
+          // Name and email: "Jim Green,jim@example.com"
+          return { name: parts[0], email: parts[1] };
+        } else {
+          // First name and last name: "Jim,Green"
+          return { name: `${parts[0]} ${parts[1]}` };
+        }
+      } else if (parts.length === 3) {
+        // Could be: "Jim,Green,jim@example.com" or "Jim,Green,Company"
+        if (parts[2].includes('@')) {
+          // First name, last name, and email: "Jim,Green,jim@example.com"
+          return { name: `${parts[0]} ${parts[1]}`, email: parts[2] };
+        } else {
+          // First name, last name, and other info: "Jim,Green,Company"
+          return { name: `${parts[0]} ${parts[1]}` };
+        }
+      } else {
+        // Multiple parts - combine first two as name, look for email
+        const name = `${parts[0]} ${parts[1]}`;
+        const email = parts.find(part => part.includes('@'));
+        return { name, email };
+      }
+    });
 }
 
 export default function Recipients() {
@@ -46,7 +76,7 @@ export default function Recipients() {
   
   // Import state
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<{ name: string }[]>([]);
+  const [preview, setPreview] = useState<ParsedRecipient[]>([]);
   const [importStep, setImportStep] = useState<'select' | 'preview'>('select');
   const fileInput = useRef<HTMLInputElement>(null);
   
@@ -125,10 +155,10 @@ export default function Recipients() {
   }
 
   function handleImport() {
-    const newRecipients = preview.map(item => ({
-      id: Date.now() + Math.random(),
+    const newRecipients: Recipient[] = preview.map((item, index) => ({
+      id: Date.now() + index,
       name: item.name,
-      email: undefined
+      email: item.email
     }));
     const updatedRecipients = [...recipients, ...newRecipients];
     setRecipients(updatedRecipients);
@@ -287,8 +317,15 @@ export default function Recipients() {
                   <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">Upload CSV File</h3>
                   <p className="text-muted-foreground mb-4">
-                    Upload a CSV file with recipient names. Each name should be on a separate line.
+                    Upload a CSV file with recipient names and emails. Supported formats:
                   </p>
+                  <div className="text-sm text-muted-foreground mb-4 space-y-1">
+                    <p>• <code className="bg-muted px-1 rounded">Jim Green</code> (full name only)</p>
+                    <p>• <code className="bg-muted px-1 rounded">Jim,Green</code> (first name, last name)</p>
+                    <p>• <code className="bg-muted px-1 rounded">Jim Green,jim@example.com</code> (name and email)</p>
+                    <p>• <code className="bg-muted px-1 rounded">Jim,Green,jim@example.com</code> (first name, last name, email)</p>
+                    <p>• Each recipient should be on a separate line</p>
+                  </div>
                   <Button onClick={() => fileInput.current?.click()}>
                     <Upload className="h-4 w-4 mr-2" />
                     Choose CSV File
@@ -302,7 +339,7 @@ export default function Recipients() {
                   />
                 </div>
                 
-                {error && <ErrorFeedback message={error} />}
+                {error && <ErrorFeedback error={error} />}
               </div>
             ) : (
               <div className="space-y-4">
@@ -316,7 +353,10 @@ export default function Recipients() {
                   <div className="max-h-40 overflow-y-auto space-y-1">
                     {preview.map((item, index) => (
                       <div key={index} className="text-sm py-1 px-2 bg-background rounded">
-                        {item.name}
+                        <div className="font-medium">{item.name}</div>
+                        {item.email && (
+                          <div className="text-xs text-muted-foreground">{item.email}</div>
+                        )}
                       </div>
                     ))}
                   </div>

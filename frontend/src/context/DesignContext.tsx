@@ -8,7 +8,9 @@ export interface TextField {
   fontSize?: number;
   fontFamily?: string;
   color?: string;
-  recipientOverrides?: { [recipientId: number]: { x?: number; y?: number; fontSize?: number } };
+  width?: number;
+  height?: number;
+  recipientOverrides?: { [recipientId: number]: { x?: number; y?: number; fontSize?: number; width?: number; height?: number } };
 }
 
 export interface ImageField {
@@ -124,7 +126,7 @@ export function DesignProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const updateTextFieldForRecipient = (textFieldId: number, recipientId: number, overrides: { x?: number; y?: number; fontSize?: number }) => {
+  const updateTextFieldForRecipient = (textFieldId: number, recipientId: number, overrides: { x?: number; y?: number; fontSize?: number; width?: number; height?: number }) => {
     setDesignSettings(prev => ({
       ...prev,
       textFields: prev.textFields.map(field => {
@@ -157,6 +159,8 @@ export function DesignProvider({ children }: { children: ReactNode }) {
       x: overrides.x ?? field.x,
       y: overrides.y ?? field.y,
       fontSize: overrides.fontSize ?? field.fontSize,
+      width: overrides.width ?? field.width,
+      height: overrides.height ?? field.height,
     };
   };
 
@@ -177,7 +181,7 @@ export function DesignProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateTemplateField = (textFieldId: number, updates: { x?: number; y?: number; fontSize?: number }) => {
+  const updateTemplateField = (textFieldId: number, updates: { x?: number; y?: number; fontSize?: number; width?: number; height?: number }) => {
     // Update the base field (template) and clear all recipient overrides
     updateTextField(textFieldId, updates);
     

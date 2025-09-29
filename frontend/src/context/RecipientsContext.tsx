@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface Recipient {
+  id: number;
   name: string;
+  email?: string;
   [key: string]: any;
 }
 

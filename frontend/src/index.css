@@ -54,6 +54,25 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground text-base; /* 16px base */
+  }
+  /* Lists default to 14px */
+  ul, ol {
+    @apply text-sm;
+  }
+}
+
+/* Explanation and list text utility (14px) */
+@layer components {
+  .explanation-text {
+    @apply text-sm; /* 14px */
+  }
+}
+
+/* Redefine text-sm to behave like base (16px) across the app */
+@layer utilities {
+  .text-sm {
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem; /* match Tailwind base line-height */
   }
 }
